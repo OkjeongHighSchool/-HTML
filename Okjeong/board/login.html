@@ -1,0 +1,76 @@
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="keywords" content="" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Inance</title>
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+        <link href="../css/style.css" rel="stylesheet" />
+      </head>   
+<body class="login-page">
+    <div class="hero_area">
+        <header class="header_section">
+          <div class="header_bottom">
+            <div class="container-fluid">
+              <nav class="navbar navbar-expand-lg custom_nav-container ">
+                <a class="navbar-brand">
+                  <span>
+                    <img src="../images/옥정고.png" alt="Logo" class="logo-image">
+                    옥정고 건의함 
+                    <!-- 사진 -->
+                  </span>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </header>
+      </div>
+
+    <!--로그인-->
+    <section class="login-form">
+        <form action="">
+            <div class="int-area">
+                <input type="text" name="id" id="id" 
+                 autocomplete="off" required>
+                 <label for="id">학교 이메일</label>
+            </div>
+            <div class="int-area">
+                <input type="password" name="pw" id="pw" 
+                 autocomplete="off" required>
+                 <label for="pw">비밀번호</label>
+            </div>
+            <div class="btn-area">
+                <button id="btn"
+                type="submit">로그인</button>
+            </div>
+        </form>
+        <div class="caption">
+            <a href="">비밀번호를 잊으셨나요?</a>
+        </div>
+    </section>
+
+    <script>
+        let id = $('#id');
+        let pw = $('#pw');
+        let btn = $('#btn');
+
+        $(btn).on('click',function() {
+            if($(id).val =="") {
+                $(id).next('label').addClass('warning');
+                setTimeout(function() {
+                    $('label').removeClass('warning')
+                },1500);
+            }
+            else if($(pw).val() =="") {
+                $(pw).next('label').addClass('warning');
+                setTimeout(function() {
+                    $('label').removeClass('warning')
+                },1500);
+            }
+        });
+    </script>
+</body>
+</html>
