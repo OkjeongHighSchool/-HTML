@@ -1,78 +1,59 @@
-const modifyFrm = document.querySelector("#modifyFrm");
-const modifyFrmList = document.querySelectorAll("#modifyFrm > div");
-const idx = location.search;
-const index = location.search.split("=")[1];
-const boardsObj = JSON.parse(localStorage.getItem("boards"));
-const board = boardsObj[index];
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// 게시글의 데이터 값 출력
-for (let i = 0; i < modifyFrmList.length; i++) {
-  const element = modifyFrmList[i].childNodes[1];
-  const id = element.name;
-  element.value = board[id];
-}
-
-// 작성한 입력 값이 빈 값인지 검사
-const isEmpty = (subject, writer, content) => {
-  if (subject.length === 0) throw new Error("제목을 입력해주세요");
-  if (writer.length === 0) throw new Error("작성자를 입력해주세요");
-  if (content.length === 0) throw new Error("내용을 입력해주세요");
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAL9zK57h0F_pG7unbzmi-b5UvzmxqvLwM",
+  authDomain: "okjeongqna-5e05d.firebaseapp.com",
+  projectId: "okjeongqna-5e05d",
+  storageBucket: "okjeongqna-5e05d.firebasestorage.app",
+  messagingSenderId: "645465839319",
+  appId: "1:645465839319:web:d7e8a928a9acb999e10292"
 };
 
-// 현재 날짜 반환 함수
-const recordDate = () => {
-  const date = new Date();
-  const yyyy = date.getFullYear();
-  let mm = date.getMonth() + 1;
-  let dd = date.getDate();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  mm = (mm > 9 ? "" : 0) + mm;
-  dd = (dd > 9 ? "" : 0) + dd;
+const auth = getAuth(app);
+document.addEventListener("DOMContentLoaded", () => {
 
-  const arr = [yyyy, mm, dd];
+    // 로그인 여부 확인 후 실행
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("로그인된 사용자:", user.email);
+        } else {
+            console.log("로그인 필요");
+            alert("로그인이 필요합니다.");
+            location.href = "../board/login.html";
+        }
+    });
+});
+const modifyHandler = async (e) => {
+  e.preventDefault();
+  const subject = e.target.subject.value;
+  const content = e.target.content.value;
+  const publicSwitch = document.getElementById("publicSwitch").checked;
+  const id = new URLSearchParams(location.search).get("id");
 
-  return arr.join("/");
+  try {
+    const docRef = doc(db, "boards", id);
+    await updateDoc(docRef, {
+      subject,
+      content,
+      date: new Date().toISOString().split("T")[0],
+      public: publicSwitch
+    });
+
+    location.href = `../board/view.html?id=${id}`;
+  } catch (e) {
+    alert("글 수정 중 오류 발생: " + e.message);
+    console.error(e);
+  }
 };
 
-// 수정완료 버튼
-const modifyHandler = (e) => {
-    e.preventDefault();
-    const subject = e.target.subject.value;
-    let writer = e.target.writer.value;
-    const content = e.target.content.value;
-
-    // 익명 및 공개 스위치 상태 확인
-    const anonymousSwitch = document.getElementById("anonymousSwitch").checked;
-    const publicSwitch = document.getElementById("publicSwitch").checked;
-
-    if(anonymousSwitch){
-      writer = "익명"
-    }
-
-    try {
-      isEmpty(subject, writer, content);
-      board.subject = subject;
-      board.writer = writer;
-      board.content = content;
-      board.date = recordDate();
-      board.anonymous = anonymousSwitch
-      board.public = publicSwitch
-  
-      const boardsStr = JSON.stringify(boardsObj);
-      localStorage.setItem("boards", boardsStr);
-      location.href = "../board/view.html" + idx;
-    } catch (e) {
-      alert(e.message);
-      console.error(e);
-    }
-};
-
-const backBtn = document.querySelector("#back");
-
-// 뒤로가기 버튼
-const backBtnHandler = (e) => {
-  location.href = document.referrer;
-};
-
-modifyFrm.addEventListener("submit", modifyHandler);
-backBtn.addEventListener("click", backBtnHandler);
+document.querySelector("#modifyFrm").addEventListener("submit", modifyHandler);
